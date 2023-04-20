@@ -1,5 +1,7 @@
-﻿using AwsBooksService.Contract;
+﻿using System.Text.Json;
+using AwsBooksService.Contract;
 using AwsBooksService.Contract.Dtos;
+using AwsBooksService.Contract.Events;
 using AwsBooksService.Mapping;
 using AwsBooksService.Repositories;
 
@@ -8,10 +10,12 @@ namespace AwsBooksService.Services
     public class BookService : IBookService
     {
         private readonly IBookRepository _repository;
+        private readonly IEventService _eventService;
 
-        public BookService(IBookRepository repository)
+        public BookService(IBookRepository repository, IEventService eventService)
         {
-            _repository = repository;
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _eventService = eventService ?? throw new ArgumentNullException(nameof(eventService));
         }
 
         public async Task<BookDto> CreateAsync(Book item)
@@ -25,29 +29,54 @@ namespace AwsBooksService.Services
 
             var dto = item.ToDto();
 
-            await _repository.CreateAsync(dto);
+            if (await _repository.CreateAsync(dto))
+            {
+                await _eventService.Push(JsonSerializer.Serialize(new CreateEvent(item)));
+            }
 
             return dto;
         }
 
         public async Task<bool> DeleteAsync(Guid id)
         {
-            return await _repository.DeleteAsync(id);
+            var result = await _repository.DeleteAsync(id);
+
+            if (result)
+            {
+                await _eventService.Push(JsonSerializer.Serialize(new DeleteEvent(id)));
+            }
+
+            return result;
         }
 
         public async Task<IEnumerable<BookDto>> GetAllAsync()
         {
-            return await _repository.GetAllAsync();
+            var result = await _repository.GetAllAsync();
+
+            await _eventService.Push(JsonSerializer.Serialize(new ReadEvent(result.Select(x => x.Id).ToArray())));
+
+            return result;
         }
 
         public async Task<BookDto> GetAsync(Guid id)
         {
-            return await _repository.GetAsync(id);
+            var result = await _repository.GetAsync(id);
+
+            await _eventService.Push(JsonSerializer.Serialize(new ReadEvent(id)));
+
+            return result;
         }
 
         public async Task<bool> UpdateAsync(Book item)
         {
-            return await _repository.UpdateAsync(item.ToDto());
+            var result = await _repository.UpdateAsync(item.ToDto());
+
+            if (result)
+            {
+                await _eventService.Push(JsonSerializer.Serialize(new UpdateEvent(item)));
+            }
+
+            return result;
         }
     }
 }

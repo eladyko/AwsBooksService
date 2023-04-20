@@ -72,7 +72,7 @@ namespace AwsBooksService.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            var result = _bookService.DeleteAsync(id);
+            var result = await _bookService.DeleteAsync(id);
 
             return Ok(result);
         }

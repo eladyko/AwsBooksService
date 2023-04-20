@@ -1,4 +1,5 @@
 using Amazon.DynamoDBv2;
+using Amazon.SQS;
 using AwsBooksService.Repositories;
 using AwsBooksService.Services;
 
@@ -14,6 +15,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IBookRepository, BookRepository>();
 builder.Services.AddSingleton<IBookService, BookService>();
 builder.Services.AddSingleton<IAmazonDynamoDB, AmazonDynamoDBClient>();
+builder.Services.AddSingleton<IAmazonSQS, AmazonSQSClient>();
+builder.Services.AddSingleton<IEventService, EventService>();
 
 var app = builder.Build();
 
