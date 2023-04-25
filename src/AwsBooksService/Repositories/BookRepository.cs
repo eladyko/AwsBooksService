@@ -3,6 +3,7 @@ using System.Text.Json;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.DynamoDBv2.Model;
+using AwsBooksService.Contract;
 using AwsBooksService.Contract.Dtos;
 
 namespace AwsBooksService.Repositories
@@ -56,7 +57,7 @@ namespace AwsBooksService.Repositories
                 TableName = TABLE_NAME,
                 Key = new Dictionary<string, AttributeValue>
                 {
-                    { "pk", new AttributeValue(id.ToString()) }
+                    { nameof(Book.Id), new AttributeValue(id.ToString()) }
                 }
             };
 
@@ -96,7 +97,7 @@ namespace AwsBooksService.Repositories
             var createRequest = new PutItemRequest
             {
                 TableName = TABLE_NAME,
-                Item = asAttributes
+                Item = asAttributes,
             };
 
             var response = await _dynamoDB.PutItemAsync(createRequest);
