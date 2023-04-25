@@ -14,7 +14,7 @@ namespace AwsBooksService.Services
 
         public async Task<bool> Push(string message)
         {
-            var queueUrlResponse = await _sqsClient.GetQueueUrlAsync("onboarding-ChangesQueue-JfvIl2hqIM7W");
+            var queueUrlResponse = await _sqsClient.GetQueueUrlAsync("BookEvents");
 
             var sendMessageRequest = new SendMessageRequest
             {
