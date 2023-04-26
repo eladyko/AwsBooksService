@@ -25,7 +25,7 @@ namespace AwsBooksService.Repositories
                 TableName = TABLE_NAME,
                 Key = new Dictionary<string, AttributeValue>
                 {
-                    { "pk", new AttributeValue(id.ToString()) }
+                    { nameof(Book.Id), new AttributeValue(id.ToString()) }
                 }
             };
 
