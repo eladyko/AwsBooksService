@@ -56,14 +56,14 @@ jobs:
        # be deployed to ECS.
        docker build -f src/AwsBooksService/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG src/
        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-       echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+       echo "{image}={$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG}"
 
    - name: Fill in the new image ID in the Amazon ECS task definition
      id: task-def
      uses: aws-actions/amazon-ecs-render-task-definition@v1
      with:
        task-definition: .github/task-definitions/api-task-definition.json
-       container-name: ${{ steps.build-image.outputs.name }}
+       container-name: books-service-container
        image: ${{ steps.build-image.outputs.image }}
 
    - name: Deploy Amazon ECS task definition
@@ -71,5 +71,5 @@ jobs:
      with:
        task-definition: ${{ steps.task-def.outputs.task-definition }}
        service: api-service
-       cluster: DevCluster
+       cluster: AutomatedCluster
        wait-for-service-stability: true
