@@ -7,7 +7,7 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["AwsBooksService/AwsBooksService.csproj", "AwsBooksService/"]
+COPY ["/AwsBooksService/AwsBooksService.csproj", "AwsBooksService/"]
 RUN dotnet restore "AwsBooksService/AwsBooksService.csproj"
 COPY . .
 WORKDIR "/src/AwsBooksService"
